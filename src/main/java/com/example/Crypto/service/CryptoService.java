@@ -17,7 +17,6 @@ public class CryptoService {
     private final AtomicInteger idGenerator = new AtomicInteger(1);
     
     public CryptoService() {
-        // Používáme idGenerator i pro počáteční data
         portfolio.add(new Crypto(idGenerator.getAndIncrement(), "Bitcoin", "BTC", 65000.0, 0.5));
         portfolio.add(new Crypto(idGenerator.getAndIncrement(), "Ethereum", "ETH", 3500.0, 5.0));
         portfolio.add(new Crypto(idGenerator.getAndIncrement(), "Cardano", "ADA", 0.45, 1000.0));
@@ -64,7 +63,6 @@ public class CryptoService {
         }
         
         Crypto existing = existingOpt.get();
-        // Aktualizujeme data, ale zachováme původní ID
         existing.setName(updatedData.getName());
         existing.setSymbol(updatedData.getSymbol());
         existing.setPrice(updatedData.getPrice());
