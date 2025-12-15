@@ -30,21 +30,15 @@ public class CryptoController {
     
     @GetMapping("/{id}")
     public ResponseEntity<Crypto> getCryptoById(@PathVariable Integer id) {
+        // Spring automaticky chytí CryptoException a vrátí 404
         Crypto crypto = cryptoService.getCryptoById(id);
-        if (crypto != null) {
-            return ResponseEntity.ok(crypto);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(crypto);
     }
     
     @PutMapping("/{id}")
     public ResponseEntity<Crypto> updateCrypto(@PathVariable Integer id, @RequestBody Crypto updatedData) {
+        // Spring automaticky chytí CryptoException a vrátí 404
         Crypto updated = cryptoService.updateCrypto(id, updatedData);
-        if (updated != null) {
-            return ResponseEntity.ok(updated);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(updated);
     }
 }

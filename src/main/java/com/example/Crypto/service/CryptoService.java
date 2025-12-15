@@ -1,11 +1,14 @@
 package com.example.Crypto.service;
 
+import com.example.Crypto.exception.CryptoException;
 import com.example.Crypto.model.Crypto;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 
 @Service
 public class CryptoService {
@@ -14,6 +17,7 @@ public class CryptoService {
     private final AtomicInteger idGenerator = new AtomicInteger(1);
     
     public CryptoService() {
+        // Používáme idGenerator i pro počáteční data
         portfolio.add(new Crypto(idGenerator.getAndIncrement(), "Bitcoin", "BTC", 65000.0, 0.5));
         portfolio.add(new Crypto(idGenerator.getAndIncrement(), "Ethereum", "ETH", 3500.0, 5.0));
         portfolio.add(new Crypto(idGenerator.getAndIncrement(), "Cardano", "ADA", 0.45, 1000.0));
@@ -29,7 +33,7 @@ public class CryptoService {
         List<Crypto> sortedList = new ArrayList<>(portfolio);
         
         if (sortCriteria != null) {
-            Comparator<Crypto> comparator = switch (sortCriteria.toLowerCase()) {
+            Comparator<Crypto> comparator = switch (sortCriteria.toLowerCase(Locale.ROOT)) {
                 case "name" -> Comparator.comparing(Crypto::getName);
                 case "price" -> Comparator.comparing(Crypto::getPrice);
                 case "quantity" -> Comparator.comparing(Crypto::getQuantity);
@@ -47,14 +51,20 @@ public class CryptoService {
         return portfolio.stream()
                 .filter(c -> c.getId().equals(id))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new CryptoException("Kryptoměna s ID " + id + " nebyla nalezena."));
     }
     
     public Crypto updateCrypto(Integer id, Crypto updatedData) {
-        Crypto existing = getCryptoById(id);
-        if (existing == null) {
-            return null;
+        Optional<Crypto> existingOpt = portfolio.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst();
+        
+        if (existingOpt.isEmpty()) {
+            throw new CryptoException("Kryptoměna s ID " + id + " nebyla nalezena pro aktualizaci.");
         }
+        
+        Crypto existing = existingOpt.get();
+        // Aktualizujeme data, ale zachováme původní ID
         existing.setName(updatedData.getName());
         existing.setSymbol(updatedData.getSymbol());
         existing.setPrice(updatedData.getPrice());
